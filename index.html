@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Boxicons for icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-mode">
+
+    <!-- Auth View -->
+    <div id="auth-view" class="auth-wrapper">
+        <div class="auth-card surface">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class='bx bx-check-double'></i>
+                </div>
+                <h2>To-Do List</h2>
+                <p>Manage your tasks efficiently.</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-target="login">Login</button>
+                <button class="auth-tab" data-target="register">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="login-username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" required autocomplete="current-password">
+                </div>
+                <div id="login-error" class="auth-error hidden">Invalid username or password</div>
+                <button type="submit" class="btn-primary auth-btn">Login</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form hidden">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="register-username" required minlength="3" autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="register-password" required minlength="6" autocomplete="new-password">
+                </div>
+                <div id="register-error" class="auth-error hidden">Username already exists</div>
+                <button type="submit" class="btn-primary auth-btn">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="dashboard-container hidden">
+        <!-- Sidebar Selection -->
+        <aside class="sidebar surface">
+            <div class="sidebar-brand">
+                <div class="logo">
+                    <i class='bx bx-check-double'></i>
+                </div>
+                <h1>To-Do List</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <p class="nav-title">Menu</p>
+                <ul class="nav-list" id="category-filter-list">
+                    <li class="active" data-category="all"><i class='bx bx-grid-alt'></i> All Tasks</li>
+                    <li data-category="today"><i class='bx bx-sun'></i> Today</li>
+                    <li data-category="upcoming"><i class='bx bx-calendar-event'></i> Upcoming</li>
+                </ul>
+
+                <p class="nav-title">Categories</p>
+                <ul class="nav-list tags-list">
+                    <li data-category="work"><span class="color-dot work"></span> Work</li>
+                    <li data-category="personal"><span class="color-dot personal"></span> Personal</li>
+                    <li data-category="study"><span class="color-dot study"></span> Study</li>
+                    <li data-category="shopping"><span class="color-dot shopping"></span> Shopping</li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile" id="user-profile-btn" aria-label="Edit Profile">
+                    <div class="avatar" id="sidebar-avatar"><i class='bx bx-user'></i></div>
+                    <div class="user-meta">
+                        <span id="current-user-display" class="username-display">User</span>
+                        <span id="current-bio-display" class="user-bio">Click to setup profile</span>
+                    </div>
+                </div>
+                <button id="logout-btn" class="icon-btn tooltip" aria-label="Log Out">
+                    <i class='bx bx-log-out'></i>
+                    <span class="tooltip-text">Log Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="top-nav">
+                <div class="search-bar surface">
+                    <i class='bx bx-search'></i>
+                    <input type="text" id="search-input" placeholder="Search tasks...">
+                </div>
+                <div class="nav-actions">
+                    <button class="icon-btn tooltip" id="notification-btn" aria-label="Notifications">
+                        <i class='bx bx-bell'></i>
+                        <span class="tooltip-text">Notifications Active</span>
+                    </button>
+                    <button id="theme-toggle" class="icon-btn tooltip" aria-label="Toggle Theme">
+                        <i class='bx bx-sun'></i>
+                        <span class="tooltip-text">Toggle Theme</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Progress Card -->
+            <section class="progress-section surface">
+                <div class="progress-info">
+                    <h2>Today's Progress</h2>
+                    <p id="progress-text">0 / 0 tasks completed</p>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+            </section>
+
+            <!-- Add Task Form -->
+            <section class="add-task-section surface">
+                <form id="add-task-form">
+                    <div class="form-group primary-input">
+                        <input type="text" id="task-title" placeholder="Add a new task..." required autocomplete="off">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group row-item">
+                            <label><i class='bx bx-flag'></i> Priority</label>
+                            <select id="task-priority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group row-item">
+                            <label><i class='bx bx-folder'></i> Category</label>
+                            <select id="task-category">
+                                <option value="none" selected>None</option>
+                                <option value="work">Work</option>
+                                <option value="personal">Personal</option>
+                                <option value="study">Study</option>
+                                <option value="shopping">Shopping</option>
+                            </select>
+                        </div>
+                        <div class="form-group row-item">
+                            <label><i class='bx bx-calendar'></i> Date & Time</label>
+                            <input type="datetime-local" id="task-datetime">
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <i class='bx bx-plus'></i> Add
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Task List Header & Filters -->
+            <div class="task-list-header">
+                <h2>Tasks</h2>
+                <div class="filter-tabs surface">
+                    <button class="filter-btn active" data-status="all">All</button>
+                    <button class="filter-btn" data-status="pending">Pending</button>
+                    <button class="filter-btn" data-status="completed">Completed</button>
+                </div>
+            </div>
+
+            <!-- Task List View -->
+            <section class="task-list-section">
+                <div id="empty-state" class="empty-state hidden">
+                    <i class='bx bx-list-check'></i>
+                    <p>All caught up! Nothing to see here.</p>
+                </div>
+                <ul id="task-list" class="task-list">
+                    <!-- Tasks injected here -->
+                </ul>
+            </section>
+        </main>
+
+        <!-- Right Panel (Widgets) -->
+        <aside class="right-panel">
+            <div class="calendar-widget surface">
+                <div class="calendar-header">
+                    <button class="icon-btn" id="prev-month"><i class='bx bx-chevron-left'></i></button>
+                    <h3 id="calendar-month-year">Month Year</h3>
+                    <button class="icon-btn" id="next-month"><i class='bx bx-chevron-right'></i></button>
+                </div>
+                <div class="calendar-grid-header">
+                    <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                </div>
+                <div class="calendar-grid" id="calendar-days">
+                    <!-- Days injected here -->
+                </div>
+            </div>
+
+            <div class="stats-widget surface">
+                <h3>Overall Stats</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-num" id="stat-total">0</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num" id="stat-completed">0</span>
+                        <span class="stat-label">Done</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num" id="stat-overdue">0</span>
+                        <span class="stat-label">Overdue</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div> <!-- /Dashboard View -->
+
+    <!-- Edit Task Modal -->
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content surface">
+            <div class="modal-header">
+                <h2>Edit Task</h2>
+                <button id="close-modal" class="icon-btn"><i class='bx bx-x'></i></button>
+            </div>
+            <form id="edit-task-form">
+                <input type="hidden" id="edit-task-id">
+                <div class="form-group">
+                    <label>Task Title</label>
+                    <input type="text" id="edit-task-title" required autocomplete="off">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="edit-task-priority">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="edit-task-category">
+                            <option value="none">None</option>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="study">Study</option>
+                            <option value="shopping">Shopping</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Date & Time</label>
+                    <input type="datetime-local" id="edit-task-datetime">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancel-edit">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-content surface profile-modal-content">
+            <div class="modal-header">
+                <h2>Your Profile</h2>
+                <button id="close-profile-modal" class="icon-btn"><i class='bx bx-x'></i></button>
+            </div>
+            <form id="profile-form">
+                <div class="profile-image-upload">
+                    <div id="profile-avatar-preview" class="avatar-preview">
+                        <i class='bx bx-camera'></i>
+                    </div>
+                    <label for="profile-avatar-input" class="btn-secondary image-upload-btn">
+                        Upload Photo
+                        <input type="file" id="profile-avatar-input" accept="image/*" class="hidden">
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Display Name</label>
+                    <input type="text" id="profile-display-name" placeholder="John Doe" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Bio / Role</label>
+                    <input type="text" id="profile-bio" placeholder="Software Engineer" autocomplete="off">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancel-profile">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Context Menu for drag state handling overlay if needed -->
+    <div id="drag-overlay" class="drag-overlay hidden">Drop here to move</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
